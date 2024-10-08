@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import cors from "cors"; // Import cors middleware
+import cors from "cors";
 import connectDB from "./config/db.js";
 import userRoute from "./routes/userRoute.js";
 import farmerRoute from "./routes/farmerRoute.js"; // Make sure this route is correctly defined
