@@ -1,5 +1,5 @@
 // controllers/farmerController.js
-import Farmer from "../models/Farmer.js"; // Import the Farmer model
+import Farmer from "../models/Farmer.js";
 
 // Get all farmers
 export const getAllFarmers = async (req, res) => {

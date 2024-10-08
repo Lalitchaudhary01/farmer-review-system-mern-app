@@ -27,9 +27,9 @@ const farmerSchema = new mongoose.Schema(
     },
     comments: [
       {
-        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Reference to User model
-        comment: { type: String, required: true }, // Make comment required
-        rating: { type: Number, min: 1, max: 5 }, // Rating should be between 1 and 5
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        comment: { type: String, required: true },
+        rating: { type: Number, min: 1, max: 5 },
         likes: { type: Number, default: 0 },
         replies: [{ type: String }],
       },

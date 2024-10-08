@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-dotenv.config(); // Load .env variables
+dotenv.config();
 
 const connectDB = async () => {
   try {
@@ -9,8 +9,8 @@ const connectDB = async () => {
     console.log("MongoDB connected successfully.");
   } catch (err) {
     console.error("MongoDB connection failed:", err.message);
-    process.exit(1); // Exit process with failure
+    process.exit(1);
   }
 };
 
-export default connectDB; // ES Module export
+export default connectDB;
