@@ -1,30 +1,54 @@
-import { User } from "../models/userModel.js";
+import Farmer from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
   try {
-    const { fullName, username, password, confirmPassword } = req.body;
-    if (!fullName || !username || !password || !confirmPassword) {
+    const { fullName, email, username, password, confirmPassword, phone, bio } =
+      req.body;
+
+    // Check if all required fields are provided
+    if (
+      !fullName ||
+      !email ||
+      !username ||
+      !password ||
+      !confirmPassword ||
+      !phone ||
+      !bio
+    ) {
       return res.status(400).json({ message: "All fields are required" });
     }
+
+    // Check if passwords match
     if (password !== confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
-    const existingUser = await User.findOne({ username });
+    // Check if a user with the same username or email already exists
+    const existingUser = await Farmer.findOne({
+      $or: [{ username }, { email }],
+    });
     if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "Username already exists, try a different one" });
+      return res.status(400).json({
+        message:
+          existingUser.username === username
+            ? "Username already exists, try a different one"
+            : "Email already exists, try a different one",
+      });
     }
 
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({
+    // Create a new user with the additional fields: email, phone, and bio
+    const newUser = await Farmer.create({
       fullName,
+      email, // Save email
       username,
       password: hashedPassword,
+      phone,
+      bio, // Save phone and bio
     });
 
     return res.status(201).json({
@@ -34,6 +58,9 @@ export const register = async (req, res) => {
         id: newUser._id,
         username: newUser.username,
         fullName: newUser.fullName,
+        email: newUser.email, // Include email in response
+        phone: newUser.phone, // Include phone in response
+        bio: newUser.bio, // Include bio in response
       },
     });
   } catch (error) {
@@ -51,7 +78,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const user = await User.findOne({ username });
+    const user = await Farmer.findOne({ username });
     if (!user) {
       return res.status(400).json({
         message: "Incorrect username or password",

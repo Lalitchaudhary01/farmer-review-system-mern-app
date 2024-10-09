@@ -1,4 +1,3 @@
-// models/Farmer.js
 import mongoose from "mongoose";
 
 const farmerSchema = new mongoose.Schema(
@@ -35,7 +34,8 @@ const farmerSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true }
-); // Add timestamps for createdAt and updatedAt
+  { timestamps: true } // Add timestamps for createdAt and updatedAt
+);
 
-export default mongoose.model("Farmer", farmerSchema);
+// Check if the model is already compiled before creating it
+export default mongoose.models.Farmer || mongoose.model("Farmer", farmerSchema);
