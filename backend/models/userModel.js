@@ -1,4 +1,3 @@
-// models/Farmer.js
 import mongoose from "mongoose";
 
 const farmerSchema = new mongoose.Schema(
@@ -15,6 +14,10 @@ const farmerSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true, // Ensure that each farmer has a unique email
+    },
+    password: {
+      type: String,
+      required: true, // Add password field and make it required
     },
     phone: {
       type: String,

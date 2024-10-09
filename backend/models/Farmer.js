@@ -15,6 +15,10 @@ const farmerSchema = new mongoose.Schema(
       required: true,
       unique: true, // Ensure that each farmer has a unique email
     },
+    password: {
+      type: String,
+      required: true,
+    },
     phone: {
       type: String,
       required: true,

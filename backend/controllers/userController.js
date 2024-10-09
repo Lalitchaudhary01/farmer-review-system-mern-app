@@ -4,8 +4,17 @@ import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
   try {
-    const { fullName, email, username, password, confirmPassword, phone, bio } =
-      req.body;
+    const {
+      fullName,
+      email,
+      username,
+      password,
+      confirmPassword,
+      phone,
+      bio,
+      photo,
+      name,
+    } = req.body;
 
     // Check if all required fields are provided
     if (
@@ -15,7 +24,9 @@ export const register = async (req, res) => {
       !password ||
       !confirmPassword ||
       !phone ||
-      !bio
+      !bio ||
+      !photo ||
+      !name
     ) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -41,14 +52,16 @@ export const register = async (req, res) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user with the additional fields: email, phone, and bio
+    // Create a new user with the additional fields: photo and name
     const newUser = await Farmer.create({
       fullName,
-      email, // Save email
+      email,
       username,
       password: hashedPassword,
       phone,
-      bio, // Save phone and bio
+      bio,
+      photo, // Save photo
+      name, // Save name
     });
 
     return res.status(201).json({
@@ -58,9 +71,11 @@ export const register = async (req, res) => {
         id: newUser._id,
         username: newUser.username,
         fullName: newUser.fullName,
-        email: newUser.email, // Include email in response
-        phone: newUser.phone, // Include phone in response
-        bio: newUser.bio, // Include bio in response
+        email: newUser.email,
+        phone: newUser.phone,
+        bio: newUser.bio,
+        photo: newUser.photo, // Include photo in response
+        name: newUser.name,
       },
     });
   } catch (error) {
@@ -73,33 +88,56 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { username, password } = req.body;
-    if (!username || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+    const { email, password } = req.body;
+
+    // Debugging logs
+    console.log("Email:", email);
+    console.log("Password:", password);
+
+    // Check if both email and password are provided
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
     }
 
-    const user = await Farmer.findOne({ username });
+    // Find the user by email
+    const user = await Farmer.findOne({ email });
+
+    // Check if user exists
     if (!user) {
       return res.status(400).json({
-        message: "Incorrect username or password",
+        message: "Incorrect email or password",
         success: false,
       });
     }
 
+    // Debugging: Check if password is being retrieved correctly
+    console.log("Stored user password:", user.password);
+
+    // Compare the provided password with the hashed password in the database
     const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+    // Debugging: Check if the password comparison is working
+    console.log("Password match:", isPasswordMatch);
+
     if (!isPasswordMatch) {
       return res.status(400).json({
-        message: "Incorrect username or password",
+        message: "Incorrect email or password",
         success: false,
       });
     }
 
-    const tokenData = { userId: user._id };
-
+    // Check if JWT secret key is set
     if (!process.env.JWT_SECRET_KEY) {
       return res.status(500).json({ message: "JWT Secret Key is missing" });
     }
 
+    // Debugging: Check token data before signing the token
+    const tokenData = { userId: user._id };
+    console.log("Token data:", tokenData);
+
+    // Sign the token
     const token = jwt.sign(tokenData, process.env.JWT_SECRET_KEY, {
       expiresIn: "1d",
     });
@@ -112,12 +150,17 @@ export const login = async (req, res) => {
         sameSite: "strict",
       })
       .json({
-        _id: user._id,
-        username: user.username,
-        fullName: user.fullName,
+        message: "Login successful",
+        success: true,
+        user: {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          fullName: user.fullName,
+        },
       });
   } catch (error) {
-    console.error(error);
+    console.error("Error in login:", error);
     return res
       .status(500)
       .json({ message: "Internal Server Error", error: error.message });
