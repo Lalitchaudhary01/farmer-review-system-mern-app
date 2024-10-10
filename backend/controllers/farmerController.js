@@ -12,14 +12,21 @@ export const getAllFarmers = async (req, res) => {
 };
 
 // Get a single farmer by ID
+// Controller function to get a farmer by ID
 export const getFarmerById = async (req, res) => {
   try {
+    // Find farmer by ID from route parameters
     const farmer = await Farmer.findById(req.params.id);
+
+    // If no farmer is found, return a 404 response
     if (!farmer) {
       return res.status(404).json({ error: "Farmer not found" });
     }
+
+    // Return the farmer data as JSON if found
     res.json(farmer);
   } catch (error) {
+    // Catch any server errors and return a 500 response
     res.status(500).json({ error: "Error fetching farmer" });
   }
 };
