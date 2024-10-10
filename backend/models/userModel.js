@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const farmerSchema = new mongoose.Schema(
   {
-    name: {
+    fullName: {
       type: String,
       required: true,
     },

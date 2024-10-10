@@ -13,7 +13,6 @@ export const register = async (req, res) => {
       phone,
       bio,
       photo,
-      name,
     } = req.body;
 
     // Check if all required fields are provided
@@ -25,8 +24,7 @@ export const register = async (req, res) => {
       !confirmPassword ||
       !phone ||
       !bio ||
-      !photo ||
-      !name
+      !photo
     ) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -60,8 +58,7 @@ export const register = async (req, res) => {
       password: hashedPassword,
       phone,
       bio,
-      photo, // Save photo
-      name, // Save name
+      photo,
     });
 
     return res.status(201).json({
@@ -74,8 +71,7 @@ export const register = async (req, res) => {
         email: newUser.email,
         phone: newUser.phone,
         bio: newUser.bio,
-        photo: newUser.photo, // Include photo in response
-        name: newUser.name,
+        photo: newUser.photo,
       },
     });
   } catch (error) {
