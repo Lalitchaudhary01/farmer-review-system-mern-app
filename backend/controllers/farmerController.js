@@ -43,20 +43,42 @@ export const getFarmerById = async (req, res) => {
 
 // Add a comment to a farmer
 export const addComment = async (req, res) => {
-  const { id } = req.params;
-  const { user, comment, rating } = req.body;
+  let { user, comment, rating } = req.body;
+  console.log(req.body);
 
   try {
-    const farmer = await Farmer.findById(id);
-    if (!farmer) return res.status(404).json({ message: "Farmer not found" });
+    console.log(req.params.id);
 
-    const newComment = { user, comment, rating }; // Create a new comment object
-    farmer.comments.push(newComment); // Push the comment to the farmer's comments array
+    const farmer = await Farmer.findOne({ _id: req.params.id });
+    console.log(farmer);
 
-    await farmer.save(); // Save the farmer with the new comment
-    res.status(201).json(farmer); // Return the updated farmer data
+    if (!farmer) {
+      return res.status(404).json({ error: "Farmer not found" });
+    }
+    user = req.params.id;
+    const newComment = {
+      user,
+      comment,
+      rating,
+      likes: 0,
+      replies: [],
+    };
+
+    // Update the farmer document with the new comment
+    await Farmer.updateOne(
+      { _id: req.params.id },
+      { $push: { comments: newComment } }
+    );
+
+    // Fetch the updated farmer document to return it
+    const updatedFarmer = await Farmer.findOne({ _id: req.params.id });
+    console.log("Updated farmer:", updatedFarmer);
+
+    // Send the updated farmer back as the response
+    res.json(updatedFarmer);
   } catch (error) {
-    res.status(500).json({ message: "Error adding comment", error });
+    console.error("Error updating farmer:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
